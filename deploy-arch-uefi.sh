@@ -31,50 +31,6 @@ echo "127.0.0.1  localhost" >> /etc/hosts
 echo "::1        localhost" >> /etc/hosts
 echo "127.0.1.1  sam-arch-pc.localdomain  sam-arch-pc" >> /etc/hosts
 #
-mkinitcpio -P
-#
-# Install required packages
-listMicrocode=("INTEL" "AMD")
-promptOpt "Desktop Environment" "${listMicrocode[@]}"
-case "${userOption}" in
-    "INTEL")
-        echo "intel-ucode" >> programs-deploy
-        echo "thermald" >> programs-deploy
-        echo "i7z" >> programs-deploy
-        ;;
-    "AMD")
-        echo "amd-ucode" >> programs-deploy
-        ;;
-esac
-#
-#
-echo "mkinitcpio" >> programs-deploy
-listLinuxKernel=("Linux" "Linux LTS" "Both")
-promptOpt "Linux Kernel" "${listLinuxKernel[@]}"
-if [[ "${userOption}" == "Linux" || "${userOption}" == "Both" ]]; then
-    echo "linux" >> programs-deploy
-    echo "linux-headers" >> programs-deploy
-fi
-if [[ "${userOption}" == "Linux LTS" || "${userOption}" == "Both" ]]; then
-    echo "linux-lts" >> programs-deploy
-    echo "linux-lts-headers" >> programs-deploy
-fi
-#
-pacman -S - < programs-deploy
-#
-# Enable services
-systemctl enable NetworkManager.service
-systemctl enable bluetooth.service
-systemctl enable cups.service
-systemctl enable sshd
-systemctl enable reflector.timer
-systemctl enable firewalld
-systemctl enable fstrim.timer
-systemctl enable paccache.timer
-systemctl enable acpid
-systemctl enable avahi-daemon
-systemctl enable libvirtd
-#
 # Clean up hook for pacman
 cp config-files/hooks-pacman/remove_old_cache.hook /etc/pacman.d/hooks/remove_old_cache.hook
 chmod -R 644 /etc/pacman.d/hooks/
@@ -158,6 +114,50 @@ sed -i.bak -e "/tmpfs \/run      tmpfs  defaults,noatime,nosuid,mode=1777  0  0/
 echo "# Use a ramdisk to store temporary data" >> /etc/fstab
 echo "tmpfs /tmp      tmpfs  defaults,noatime,nosuid,mode=1777  0  0" >> /etc/fstab
 echo "tmpfs /run      tmpfs  defaults,noatime,nosuid,mode=1777  0  0" >> /etc/fstab
+#
+# Install required packages
+listMicrocode=("Intel" "AMD")
+promptOpt "Desktop Environment" "${listMicrocode[@]}"
+case "${userOption}" in
+    "Intel")
+        echo "intel-ucode" >> programs-deploy
+        echo "thermald" >> programs-deploy
+        echo "i7z" >> programs-deploy
+        ;;
+    "AMD")
+        echo "amd-ucode" >> programs-deploy
+        ;;
+esac
+#
+#
+echo "mkinitcpio" >> programs-deploy
+listLinuxKernel=("Linux" "Linux LTS" "Both")
+promptOpt "Linux Kernel" "${listLinuxKernel[@]}"
+if [[ "${userOption}" == "Linux" || "${userOption}" == "Both" ]]; then
+    echo "linux" >> programs-deploy
+    echo "linux-headers" >> programs-deploy
+fi
+if [[ "${userOption}" == "Linux LTS" || "${userOption}" == "Both" ]]; then
+    echo "linux-lts" >> programs-deploy
+    echo "linux-lts-headers" >> programs-deploy
+fi
+#
+pacman -S - < programs-deploy
+#
+mkinitcpio -P
+#
+# Enable services
+systemctl enable NetworkManager.service
+systemctl enable bluetooth.service
+systemctl enable cups.service
+systemctl enable sshd
+systemctl enable reflector.timer
+systemctl enable firewalld
+systemctl enable fstrim.timer
+systemctl enable paccache.timer
+systemctl enable acpid
+systemctl enable avahi-daemon
+systemctl enable libvirtd
 #
 # Enable GRUB
 grub-install --target=x86_64-efi --efi-directory=/boot --bootloader-id=GRUB --recheck
