@@ -1,3 +1,4 @@
+# List of all programs to be installed when installing the GUI
 xorg
 xorg-xwayland
 mesa
@@ -12,3 +13,4 @@ htop
 vim
 code
 telegram-desktop
+terminator

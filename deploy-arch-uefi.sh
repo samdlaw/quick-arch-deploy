@@ -108,6 +108,7 @@ if [ ${swapFlSize} != 0 ]; then
 fi
 #
 # Update fstab for tmpfs
+# Remove the tempfs lines if already present, if created by this script. Otherwise, may need to amned
 sed -i.bak -e "/# Use a ramdisk to store temporary data/d" /etc/fstab
 sed -i.bak -e "/tmfs \/tmp      tmpfs  defaults,noatime,nosuid,mode=1777  0  0/d" /etc/fstab
 sed -i.bak -e "/tmpfs \/run      tmpfs  defaults,noatime,nosuid,mode=1777  0  0/d" /etc/fstab
@@ -130,7 +131,6 @@ case "${userOption}" in
 esac
 #
 #
-echo "mkinitcpio" >> programs-deploy
 listLinuxKernel=("Linux" "Linux LTS" "Both")
 promptOpt "Linux Kernel" "${listLinuxKernel[@]}"
 if [[ "${userOption}" == "Linux" || "${userOption}" == "Both" ]]; then
@@ -141,6 +141,13 @@ if [[ "${userOption}" == "Linux LTS" || "${userOption}" == "Both" ]]; then
     echo "linux-lts" >> programs-deploy
     echo "linux-lts-headers" >> programs-deploy
 fi
+#
+# Additional defaults softwares
+cat >> programs-desktop << EOL
+mkinitcpio
+linux-firmware
+base-devel
+EOL
 #
 pacman -S - < programs-deploy
 #
@@ -185,41 +192,26 @@ while true; do
         break
     fi
 done
-# Get passowrd & confirm it is correct for new user
-while true; do
-    read -s -p "Enter password for ${newUser}: " newUserPass
-    echo ""
-    read -s -p "Re-enter password for ${newUser}: " newUserPassConfirm
-    echo ""
-    if [ -z "${newUserPass}" ] || [ "${newUserPass}" != "${newUserPassConfirm}" ]; then
-        echo "Password is blank or do not match. Try again"
-    else
-        break
-    fi
-done
+# Get password & confirm it is correct for new user
+promptPassword
 #
-while true; do
-    read -p  "Do you want same password for root? (y/N): " responseYN
-    case ${responseYN} in 
-        [Yy]*) 
-            newRootPass="${newUserPass}"
-            break;;
-        [Nn]*)
-            read -p  "Enter new password for root: " newRootPass
-            break;;
-        *) echo "Please enter only Y or N"
-            ;;
-    esac
-done
-#
-# Change root user password
-echo root:${newRootPass} | chpasswd
+# Enable wheel user group to ensure sudo privileges can be extended to new user
 sed -i.bak -e "s/# %wheel ALL=(ALL) ALL/%wheel ALL=(ALL) ALL/" /etc/sudoers
 #
 # Add new user
 useradd -m -G wheel -s /bin/bash -c "${newUser}" -U ${newUserLogin}
 echo ${newUserLogin}:${newUserPass} | chpasswd
 usermod -aG libvirt ${newUser}
+#
+# Get password for root user
+prompt "Do you want same password for root?"
+if [[ "${userResponse}" == "N" ]]; then
+    promptPassword
+fi
+newRootPass="${newUserPass}"
+#
+# Change root user password
+echo root:${newRootPass} | chpasswd
 #
 # Add specific settings
 cp -a config-files/dot-files-home/. /home/${newUser}/

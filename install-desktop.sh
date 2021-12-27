@@ -19,8 +19,10 @@ fi
 #
 # Install based on option provided
 listDE=("GNOME" "KDE" "XFCE")
+systemctl disable gdm sddm lightdm
 promptOpt "Desktop Environment" "${listDE[@]}"
 case "${userOption}" in
+# Install GNOME Desktop Environment
     "GNOME")
         echo "Installing gnomde desktop..."
         cat >> programs-desktop << EOL
@@ -39,6 +41,7 @@ EOL
         fi
         systemctl enable gdm
         ;;
+# Install KDE Desktop Environment
     "KDE")
         echo "Installing kde plasma desktop..."
         cat >> programs-desktop << EOL
@@ -57,6 +60,7 @@ EOL
         fi
         systemctl enable sddm
         ;;
+# Install XFCE Desktop Environment
     "XFCE")
         echo "Installing xfce desktop..."
         cat >> programs-desktop << EOL

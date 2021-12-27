@@ -1,5 +1,4 @@
-linux-firmware
-base-devel
+# List of programs to be installed while installing the OS - In future might move few to main script as default
 vim
 nano
 efibootmgr
