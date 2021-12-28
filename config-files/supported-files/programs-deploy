@@ -7,7 +7,6 @@ os-prober
 openssh
 networkmanager
 nm-connection-editor
-network-manager-applet
 wpa_supplicant
 dialog
 usbutils
@@ -18,13 +17,18 @@ cups
 cups-pdf
 hplip
 reflector
-acpid
 avahi
+#
+# Audio
+#
 alsa-utils
 pipewire
 pipewire-alsa
 pipewire-pulse
 pipewire-jack
+#
+# File Systems
+#
 mtools
 dosfstools
 btrfs-progs
@@ -32,11 +36,24 @@ exfatprogs
 exfat-utils
 f2fs-tools
 e2fsprogs
+hfsprogs
 nilfs-utils
 ntfs-3g
 udftools
 xfsprogs
+#
+# Power Management
+#
 cpupower
+acpid
+acpi
 turbostat
+#
+# Fonts
+#
 terminus-font
+noto-fonts
+# Microsoft fonts - Refer https://wiki.archlinux.org/title/Microsoft_fonts
+ttf-ms-fonts
+ttf-vista-fonts
 libvirt

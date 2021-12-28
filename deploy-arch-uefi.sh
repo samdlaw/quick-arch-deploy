@@ -24,14 +24,22 @@ rm /etc/vconsole.conf
 echo "KEYMAP=us" >> /etc/vconsole.conf
 #
 rm /etc/hostname
-echo "sam-arch-pc" >> /etc/hostname
+while true
+    read -p  "Enter the hostname for the device: " newHostname
+    if [ -z "${newHostname}" ]; then
+        echo "Hostname can not be blank"
+    else
+        break
+    fi
+done
+echo ${newHostname} >> /etc/hostname
 #
 rm /etc/hosts
 echo "127.0.0.1  localhost" >> /etc/hosts
 echo "::1        localhost" >> /etc/hosts
-echo "127.0.1.1  sam-arch-pc.localdomain  sam-arch-pc" >> /etc/hosts
+echo "127.0.1.1  ${newHostname}.localdomain  ${newHostname}" >> /etc/hosts
 #
-# Clean up hook for pacman
+# Copy clean up hook for pacman
 cp config-files/hooks-pacman/remove_old_cache.hook /etc/pacman.d/hooks/remove_old_cache.hook
 chmod -R 644 /etc/pacman.d/hooks/
 #

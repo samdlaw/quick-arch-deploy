@@ -47,6 +47,7 @@ EOL
         cat >> programs-desktop << EOL
 sddm
 plasma
+plasma-nm
 plasma-wayland-session
 powerdevil
 yakuake

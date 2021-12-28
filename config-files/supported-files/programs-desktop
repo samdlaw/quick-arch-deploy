@@ -1,4 +1,5 @@
 # List of all programs to be installed when installing the GUI
+network-manager-applet
 xorg
 xorg-xwayland
 mesa
